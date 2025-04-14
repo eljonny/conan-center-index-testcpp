@@ -1,0 +1,11 @@
+sources:
+  "0.1.1-beta.2":
+    url: "https://github.com/eljonny/TestCPP/archive/v0.1.1-beta.2.tar.gz"
+    sha256: "04e038d91765a9e6e9b68dfebbe8dbfdba1d929054d6bc6f66ce87c46c4720d6"
+# Currently no patches.
+#patches:
+  #"0.1.1-beta.2":
+    #- patch_file: "patches/0001-fix.patch"
+      #patch_description: "patch description here"
+      #patch_type: "backport"
+      #patch_source: "https://github.com/owner/package/pulls/42"

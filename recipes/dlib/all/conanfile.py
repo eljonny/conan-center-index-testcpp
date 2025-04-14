@@ -8,7 +8,7 @@ from conan.errors import ConanInvalidConfiguration
 import os
 
 
-required_conan_version = ">=1.53.0"
+required_conan_version = ">=2.1"
 
 
 class DlibConan(ConanFile):
@@ -92,7 +92,7 @@ class DlibConan(ConanFile):
         if self.options.with_jpeg:
             self.requires("libjpeg/9e")
         if self.options.with_png:
-            self.requires("libpng/1.6.40")
+            self.requires("libpng/[>=1.6 <2]")
         if self.options.get_safe("with_webp"):
             self.requires("libwebp/1.3.2")
         if self.options.with_sqlite3:
@@ -177,6 +177,8 @@ class DlibConan(ConanFile):
                 tc.variables["USE_SSE4_INSTRUCTIONS"] = self.options.with_sse4
             if self.options.with_avx != "auto":
                 tc.variables["USE_AVX_INSTRUCTIONS"] = self.options.with_avx
+        if Version(self.version) < "19.24.2":
+            tc.cache_variables["CMAKE_POLICY_VERSION_MINIMUM"] = "3.5" # CMake 4 support
         tc.generate()
         tc = CMakeDeps(self)
         tc.generate()

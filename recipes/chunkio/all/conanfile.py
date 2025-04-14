@@ -1,16 +1,18 @@
 from conan import ConanFile
 from conan.tools.files import apply_conandata_patches, export_conandata_patches, get, copy
 from conan.tools.cmake import CMake, CMakeToolchain, cmake_layout
+from conan.tools.scm import Version
+from conan.errors import ConanException
 import os
 
-required_conan_version = ">=1.53.0"
+required_conan_version = ">=2.1"
 
 class ChunkIOConan(ConanFile):
     name = "chunkio"
     description = "Simple library to manage chunks of data in memory and file system"
     license = "Apache-2.0"
     url = "https://github.com/conan-io/conan-center-index"
-    homepage = "https://github.com/edsiper/chunkio"
+    homepage = "https://github.com/fluent/chunkio"
     topics = ("chunk", "io", "memory", "file")
     package_type = "library"
     settings = "os", "arch", "compiler", "build_type"
@@ -50,9 +52,12 @@ class ChunkIOConan(ConanFile):
         tc.variables["CIO_LIB_STATIC"] = not self.options.shared
         tc.variables["CIO_LIB_SHARED"] = self.options.shared
         tc.variables["CIO_BACKEND_FILESYSTEM"] = self.options.with_filesystem
-        # Relocatable shared libs on macOS
+        # Relocatable shared lib on Macos
         tc.cache_variables["CMAKE_POLICY_DEFAULT_CMP0042"] = "NEW"
         tc.cache_variables["CMAKE_POLICY_DEFAULT_CMP0077"] = "NEW"
+        tc.cache_variables["CMAKE_POLICY_VERSION_MINIMUM"] = "3.5" # CMake 4 support
+        if Version(self.version) > "1.5.2": # pylint: disable=conan-unreachable-upper-version
+            raise ConanException("CMAKE_POLICY_VERSION_MINIMUM hardcoded to 3.5, check if new version supports CMake 4")
         tc.generate()
 
     def build(self):
@@ -70,3 +75,5 @@ class ChunkIOConan(ConanFile):
         self.cpp_info.libs = ["chunkio-shared"] if self.options.shared else ["chunkio-static", "cio-crc32"]
         if self.settings.os == "Windows":
             self.cpp_info.system_libs.append("shlwapi")
+            if Version(self.version) >= "1.5.0":
+                self.cpp_info.system_libs.append("ws2_32")
